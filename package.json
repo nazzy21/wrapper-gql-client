@@ -1,0 +1,32 @@
+{
+  "name": "@wrapper/gql-client",
+  "version": "1.0.0",
+  "description": "",
+  "main": "Gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github:nazzy21/wrapper-gql-client.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@babel/core": "^7.8.7",
+    "@babel/plugin-transform-runtime": "^7.8.3",
+    "@babel/preset-env": "^7.7.1",
+    "@babel/preset-react": "^7.7.0",
+    "react": "^16.12.0",
+    "ua-parser-js": "^0.7.21",
+    "axios": "^0.19.2",
+    "underscore": "^1.10.2"
+  },
+  "devDependencies": {
+    "gulp": "^4.0.2",
+    "gulp-beautify": "^3.0.0",
+    "gulp-clean": "^0.4.0",
+    "through2": "^3.0.1"
+  }
+}
