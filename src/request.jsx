@@ -1,5 +1,5 @@
 import axios from "axios";
-import * as _ from "./utils";
+import _ from "./utils";
 
 const DEFAULT_HEADERS = {
     'Content-Type': 'application/json',

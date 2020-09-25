@@ -1,11 +1,11 @@
 import {gqlQuery} from "./query";
-import * as _ from "./utils";
+import _ from "./utils";
 
 export default class GQLQueryState {
 	/**
 	 Constructor
 
-	 @param {string} nameOrAlias
+	 @param {string} name
 	 	The name or alias of the query to run when fetching the state data from the database.
 	 @param {object} args
 	 	The query arguments definition.
@@ -13,12 +13,14 @@ export default class GQLQueryState {
 	 	The GraphQL AST query definition.
 	 @param {object} defaults
 	 	The default object state.
+     @param {array<function>} subscribers
+        The list of listeners that listens to the state change.
 	**/
-	constructor({nameOrAlias, args = {}, query, defaults = {}}) {
-		this.name = nameOrAlias;
+	constructor({name, args = {}, query, defaults = {}, subscribers = []}) {
+		this.name = name;
 		this.args = args;
 		this.queryString = query;
-		this.state = {};
+		this.state = this.prepareState(defaults||{});
 		this.oldState = {};
         this.state = defaults || {};
         this.subscribers = subscribers || [];
@@ -34,6 +36,13 @@ export default class GQLQueryState {
         this.__onError = this.__onError.bind(this);
         this.toQuery = this.toQuery.bind(this);
 	}
+
+    /**
+     Helper method to prepare the state before setting.
+    **/
+    prepareState(state) {
+        return state;
+    }
 
 	/**
 	 Sets or replace a new value of the query arguments.
@@ -77,7 +86,8 @@ export default class GQLQueryState {
 		const args = {};
 
 		for(const key of _.keys(this.args)) {
-			args[key] = this.getArg(key);
+			args[key] = this.args[key];
+            args[key].value = this.getArg(key);
 		}
 
 		return {

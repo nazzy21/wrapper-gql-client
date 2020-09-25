@@ -1,4 +1,4 @@
-import * as _ from "./utils";
+import _ from "./utils";
 import Request from "./request";
 
 /**
@@ -36,10 +36,9 @@ export function GQLClientQuery({headers, query, success, errors}) {
         return;
     }
 
-    headers = headers || {};
-    _.extend(client.headers, headers);
+    const _headers = _.extend({}, client.headers, headers||{});
 
-    return Request({headers}).get(client.url, query);
+    return Request({headers: _headers}).get(client.url, query);
 }
 
 /**
@@ -63,10 +62,9 @@ export function GQLClientMutation({headers, query, success, errors}) {
         return;
     }
 
-    headers = headers || {};
-    _.extend(client.headers, headers);
+    const _headers = _.extend({}, client.headers, headers||{});
 
-    return Request({headers}).post(client.url, query);
+    return Request({headers: _headers}).post(client.url, query);
 }
 
 /**
@@ -98,11 +96,10 @@ export function GQLClientUpload({headers, query, name, files, success, errors}) 
         formData.append(name, file, file.name);
     }
 
-    headers = headers||{};
-    _.extend(client.headers, headers);
+    const _headers = _.extend({}, client.headers, headers||{});
 
     // Mark as an upload
-    headers['X-GQL-Upload'] = true;
+    _headers['X-GQL-Upload'] = true;
 
     return Request({
         headers: _headers, 

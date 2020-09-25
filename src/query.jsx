@@ -1,6 +1,5 @@
 import {GQLClientQuery} from "./client";
-import * as _ from "./utils";
-import {i18n} from "./lang";
+import _ from "./utils";
 
 /**
  Handles graphql `query` to the server.
@@ -11,8 +10,8 @@ export default class GQLQuery {
 		this.reset();
 
 		// Bind listeners
-		this.handleErrorResponse = this.handleErrorResponse.bind(this);
-		this.handleResponse = this.handleResponse.bind(this);
+		this.__handleErrorResponse = this.__handleErrorResponse.bind(this);
+		this.__handleResponse = this.__handleResponse.bind(this);
 	}
 
 	/**
@@ -52,7 +51,7 @@ export default class GQLQuery {
 	}
 
 	/**
-	 @param {string} nameOrAlias
+	 @param {string} name
 	 	A unique name to quickly identify the query. The name must also similar to the `query` argument.
 	 @param {object} args
 	 	An object which defines the types of argument the query contain.
@@ -81,26 +80,26 @@ export default class GQLQuery {
 	 	The callable function to execute if the query consist of errors.
 	 @returns {void}
 	**/
-	set({nameOrAlias, args = {}, query, onSuccess, onError}) {
-		_.devAssert(!_.isEmpty(nameOrAlias), "Missing query name!");
-		_.devAssert(!_.isEmpty(query), "Missing query definition!");
+	set({name, args = {}, query, onSuccess, onError}) {
+		_.devAssert(name, "Missing query name!");
+		_.devAssert(query, "Missing query definition!");
 
 		if (onSuccess) {
-			this.successCallbacks[nameOrAlias] = onSuccess;
+			this.successCallbacks[name] = onSuccess;
 		}
 
 		if (onError) {
-			this.errorCallbacks[nameOrAlias] = onError;
+			this.errorCallbacks[name] = onError;
 		}
 
 		// Check if query exist
-		let pos = _.findIndex(this.queries, {name: nameOrAlias});
+		let pos = _.findIndex(this.queries, {name});
 
 		if (pos < 0) {
 			pos = this.queries.length;
 		}
 
-		this.queries[pos] = {name: nameOrAlias, query, args};
+		this.queries[pos] = {name, query, args};
 	}
 
 	/**
@@ -182,7 +181,7 @@ export default class GQLQuery {
 	 @callback
 	**/
 	__handleErrorResponse(err) {
-		return this.serverError([err]);
+		return this.__serverError([err]);
 	}
 
 	/**
@@ -234,7 +233,7 @@ export default class GQLQuery {
 	**/
 	__execErrors(errors) {
 		for(const key of _.keys(errors)) {
-			if (!this.errorCallbacks[key]) {
+			if (!errors[key] || !this.errorCallbacks[key]) {
 				continue;
 			}
 
@@ -247,7 +246,7 @@ export default class GQLQuery {
 	**/
 	__execSuccess(data) {
 		for(const key of _.keys(data)) {
-			if (!this.successCallbacks[key]) {
+			if (!data[key] || !this.successCallbacks[key]) {
 				continue;
 			}
 
@@ -271,14 +270,14 @@ export default class GQLQuery {
 	 @param {object} variables
 	 	The list of variables supplied in the query.
 	**/
-	__getQuery(query, queries, queryArgs, vars, variables) {
+	__getQuery({name, query, args}, queries, queryArgs, vars, variables) {
 		if (!args || _.isEmpty(args)) {
 			queries.push(query);
 
 			return;
 		}
 
-		for(const key of Object.keys(args)) {
+		for(const key of _.keys(args)) {
 			const {type, value} = args[key],
 				argKey = `${name}_${key}`;
 

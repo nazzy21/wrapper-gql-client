@@ -1,3 +1,13 @@
 import * as _ from "underscore";
 
-module.exports = _;
+_.extend(_, {devAssert});
+
+export default _;
+
+function devAssert(condition, message) {
+    if ((_.isBoolean(condition) && condition) || condition) {
+        return;
+    }
+
+    throw new Error(message);
+}
